@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.ekert.mavendemo</groupId>
+	<artifactId>app</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<name>app</name>
+	<!-- FIXME change it to the project's website -->
+	<url>http://www.example.com</url>
+
+	<properties>
+		<jdkversion>17</jdkversion>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>${jdkversion}</maven.compiler.source>
+		<maven.compiler.target>${jdkversion}</maven.compiler.target>
+		<app.folder>app</app.folder>
+		<app.name>App</app.name>
+		<app.exe>${app.name}.exe</app.exe>
+		<launch4j.dir>C:/Program Files (x86)/Launch4j</launch4j.dir> <!--  ANPASSEN ! -->
+		<dir.jarfile>${project.build.directory}</dir.jarfile>
+		<dir.jarpath>
+			${project.build.directory}/${project.artifactId}-${project.version}.jar</dir.jarpath>
+		<manifest.path>${project.basedir}/build/${app.name}.manifest</manifest.path>
+		<app.javaversion>jre-17.0.6.10-hotspot</app.javaversion> <!--  ANPASSEN ! -->
+		<app.jre>C:\openjdk17\${app.javaversion}</app.jre> <!--  ANPASSEN ! -->
+		<app.fullname>Mobile University App</app.fullname>
+		<app.version>0.0.0.1</app.version>
+	</properties>
+
+	<dependencies>
+		<!--
+		https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.9.3</version>
+			<scope>test</scope>
+		</dependency>
+		<!--
+		https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.20.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeScope>compile</includeScope>
+							<outputDirectory>
+								${project.build.directory}/libs
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>libs/</classpathPrefix>
+							<mainClass>
+								de.ekert.mavendemo.swing.MinimalSwingApplication
+							</mainClass>
+						</manifest>
+						<manifestEntries>
+							<SplashScreen-Image>logo.png</SplashScreen-Image>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<target>
+								<tstamp>
+									<format property="timestamp"
+										pattern="yyyy-MM-dd-HH-mm-ss" />
+								</tstamp>
+								<echo>Version: ${project.version}.${timestamp} build for Java ${jdkversion}</echo>
+								<replaceregexp byline="true"
+									file="src/main/java/de/ekert/mavendemo/app/BuildInfo.java"
+									match="VERSION = .*"
+									replace='VERSION = "${timestamp}";' />
+								<replaceregexp byline="true"
+									file="src/main/java/de/ekert/mavendemo/app/BuildInfo.java"
+									match="VERSIONBUILDER = .*"
+									replace='VERSIONBUILDER = "${user.name}";' />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>build-exe</id>
+						<phase>package</phase>
+						<configuration>
+
+							<!-- Call with ${app.folder}, ${app.url} and
+							${app.fullname} -->
+							<target>
+								<!-- Download and install
+								http://launch4j.sourceforge.net/ -->
+
+								<taskdef name="launch4j"
+									classname="net.sf.launch4j.ant.Launch4jTask"
+									classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
+
+								<mkdir dir="${dir.jarfile}\${app.folder}" />
+								<delete failonerror="false">
+									<fileset dir="${dir.jarfile}\${app.folder}">
+										<!-- Delete old exe -->
+										<include name="${app.name}.exe" />
+									</fileset>
+								</delete>
+								<echo>Schreibe ${app.fullname} für ${app.url} in
+									Verzeichnis ${app.folder}</echo>
+								<copy
+									todir="${dir.jarfile}\${app.folder}\jre"
+									preservelastmodified="true">
+									<fileset
+										dir="${app.jre}">
+									</fileset>
+								</copy>
+								<copy
+									todir="${dir.jarfile}\${app.folder}\libs"
+									preservelastmodified="true">
+									<fileset 
+										dir="${project.build.directory}/libs">
+									</fileset>
+								</copy>
+								<launch4j>
+									<config
+										outfile="${dir.jarfile}\${app.folder}\${project.artifactId}-${project.version}.exe"
+										jarpath="${dir.jarpath}"
+										manifest="${manifest.path}"
+										cmdLine="${app.javaversion}"
+										headerType="gui"
+										stayAlive="true">
+										<jre path="./jre" minVersion="17" />
+										<!-- use bundled jre at
+										./${app.javaversion} or fallback to
+										version 17 system jre -->
+										<versionInfo
+											fileVersion="${app.version}"
+											txtFileVersion="${app.version}"
+											productVersion="${app.version}"
+											txtProductVersion="${app.version}"
+											productName="${app.fullname}"
+											internalName="${app.fullname}"
+											fileDescription="${app.fullname}"
+											copyright="Mobile Univeersity 2023"
+											companyName="Mobile University"
+											originalFilename="${app.exe}" />
+									</config>
+								</launch4j>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+		<pluginManagement><!-- lock down plugins versions to avoid using Maven
+			defaults (may be moved to parent pom) -->
+			<plugins>
+				<!-- clean lifecycle, see
+				https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+				<plugin>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>
+				<!-- default lifecycle, jar packaging: see
+				https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.3.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.11.0</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.1.2</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.3.0</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>3.1.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>3.1.1</version>
+				</plugin>
+				<!-- site lifecycle, see
+				https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+				<plugin>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.7.1</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>3.4.5</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
