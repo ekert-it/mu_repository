@@ -102,30 +102,6 @@
 				<version>1.8</version>
 				<executions>
 					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<configuration>
-							<target>
-								<tstamp>
-									<format property="timestamp"
-										pattern="yyyy-MM-dd-HH-mm-ss" />
-								</tstamp>
-								<echo>Version: ${project.version}.${timestamp} build for Java ${jdkversion}</echo>
-								<replaceregexp byline="true"
-									file="src/main/java/de/ekert/mavendemo/app/BuildInfo.java"
-									match="VERSION = .*"
-									replace='VERSION = "${timestamp}";' />
-								<replaceregexp byline="true"
-									file="src/main/java/de/ekert/mavendemo/app/BuildInfo.java"
-									match="VERSIONBUILDER = .*"
-									replace='VERSIONBUILDER = "${user.name}";' />
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-					<execution>
 						<id>build-exe</id>
 						<phase>package</phase>
 						<configuration>
