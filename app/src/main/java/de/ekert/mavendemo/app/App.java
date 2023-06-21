@@ -43,7 +43,7 @@ public class App
 	private static Logger logger = LogManager.getLogger(App.class);
 	public static void main( String[] args )
     {
-        App app = new App("Mobile University 1 Application");
+        App app = new App("Mobile University 3 Application");
         try {
 			System.out.println(app.quotient(3.0f, 4.5f));
 			logger.info("Meine tolle App funktioniert.");
