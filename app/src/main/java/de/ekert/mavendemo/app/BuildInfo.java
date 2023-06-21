@@ -4,7 +4,7 @@
 package	de.ekert.mavendemo.app;
 
 public class BuildInfo {
-	private static final String VERSION = "2023-06-21-16-40-14";
+	private static final String VERSION = "2023-06-21-16-43-09";
 	private static final String VERSIONBUILDER = "thomase";
 
 	public static String getVersion(){
