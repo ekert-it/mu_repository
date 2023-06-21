@@ -19,8 +19,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import de.ekert.mavendemo.app.BuildInfo;
-
 /**
  * Simple harness for testing GUI code.
  * 
@@ -88,7 +86,7 @@ public final class MinimalSwingApplication {
 
 		@Override
 		public void actionPerformed(ActionEvent aEvent) {
-			JOptionPane.showMessageDialog(fFrame, "Erstellt für einen Java Tools Workshop der Mobile University.\n\nLetzter Build\n   am: " + BuildInfo.getVersion() + "\n   von: " + BuildInfo.getBuilder());
+			JOptionPane.showMessageDialog(fFrame, "Erstellt für einen Java Tools Workshop der Mobile University.");
 		}
 
 		private JFrame fFrame;
